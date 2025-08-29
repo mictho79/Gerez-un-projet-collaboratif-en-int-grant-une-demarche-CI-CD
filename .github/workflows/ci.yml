@@ -54,11 +54,11 @@ jobs:
         run: npm ci
 
       - name: Run Angular tests with coverage (headless)
-        env:
-          CHROME_BIN: ${{ env.CHROME_PATH }}
-        run: >
-          npm run test -- --watch=false --browsers=ChromeHeadless
-          --no-sandbox --no-progress --code-coverage
+  env:
+    CHROME_BIN: ${{ env.CHROME_PATH }}
+  run: >
+    npm run test -- --watch=false --browsers=ChromeHeadless
+    --no-progress --code-coverage
 
       - name: Upload Angular coverage report
         uses: actions/upload-artifact@v4
