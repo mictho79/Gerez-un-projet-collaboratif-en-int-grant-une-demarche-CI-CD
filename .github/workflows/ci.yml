@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  # SonarCloud
+  SONAR_HOST_URL: https://sonarcloud.io
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
 jobs:
   backend:
     name: Backend Tests (Spring Boot)
@@ -13,6 +18,7 @@ jobs:
     defaults:
       run:
         working-directory: back
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -23,6 +29,7 @@ jobs:
           distribution: temurin
           java-version: '11'
 
+      # Tests + rapport Jacoco 
       - name: Build & Test with Maven
         run: mvn -B clean verify
 
@@ -32,12 +39,20 @@ jobs:
           name: jacoco-report
           path: back/target/site/jacoco/
 
+      # Analyse SonarCloud (lit back/sonar-project.properties)
+      - name: SonarCloud Scan (backend)
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ env.SONAR_HOST_URL }}
+
   frontend:
     name: Frontend Tests (Angular)
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: front
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -47,13 +62,13 @@ jobs:
         with:
           node-version: '18'
 
-      
       - name: Install Chrome
         uses: browser-actions/setup-chrome@v1
 
       - name: Install dependencies
         run: npm ci
 
+      # Tests Angular en headless + couverture (lcov)
       - name: Run Angular tests with coverage (headless)
         env:
           CHROME_BIN: ${{ env.CHROME_PATH }}  
@@ -66,3 +81,10 @@ jobs:
         with:
           name: angular-coverage
           path: front/coverage/
+
+      # Analyse SonarCloud (lit front/sonar-project.properties)
+      - name: SonarCloud Scan (frontend)
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ env.SONAR_HOST_URL }}
