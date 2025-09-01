@@ -56,17 +56,20 @@ jobs:
           node-version: '18'
 
       - name: Install Chrome
+        id: chrome
         uses: browser-actions/setup-chrome@v1
+
+      - name: Export CHROME_BIN
+        run: echo "CHROME_BIN=${{ steps.chrome.outputs.chrome-path }}" >> $GITHUB_ENV
 
       - name: Install dependencies
         run: npm ci
 
       - name: Run Angular tests with coverage (headless)
-        env:
-          CHROME_BIN: ${{ env.CHROME_PATH }}
-        run: >
-          npm run test -- --watch=false --browsers=ChromeHeadless
-          --code-coverage --no-progress
+        run: npx ng test --watch=false --browsers=ChromeHeadless --code-coverage --no-progress
+
+      - name: Show coverage tree (debug)
+        run: ls -R coverage || true
 
       - name: Upload Angular coverage report
         uses: actions/upload-artifact@v4
