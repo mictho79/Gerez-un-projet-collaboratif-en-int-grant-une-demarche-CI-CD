@@ -15,9 +15,6 @@ module.exports = function (config) {
     client: {
       jasmine: {
         // you can add configuration options for Jasmine here
-        // the possible options are listed at https://jasmine.github.io/api/edge/Configuration.html
-        // for example, you can disable the random execution with `random: false`
-        // or set a specific seed with `seed: 4321`
       },
       clearContext: false // leave Jasmine Spec Runner output visible in browser
     },
@@ -28,11 +25,13 @@ module.exports = function (config) {
       dir: require('path').join(__dirname, './coverage/bobapp'),
       subdir: '.',
       reporters: [
-        { type: 'html' },
-        { type: 'text-summary' }
-      ]
+        { type: 'html' },          // rapport HTML
+        { type: 'text-summary' },  // résumé console
+        { type: 'lcovonly' }       // <== génère coverage/bobapp/lcov.info
+      ],
+      fixWebpackSourcePaths: true
     },
-    reporters: ['progress', 'kjhtml'],
+    reporters: ['progress', 'kjhtml', 'coverage'], // <== ajoute "coverage" ici
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
