@@ -3,7 +3,7 @@ name: Docker - Build & Push
 on:
   push:
     branches: [ master ]
-    tags: [ 'v*.*.*' ]   
+    tags: [ 'v*.*.*' ]
   workflow_dispatch:
 
 jobs:
@@ -33,10 +33,11 @@ jobs:
         with:
           images: ${{ matrix.image }}
           tags: |
-            type=ref,event=branch,branch=master
-            type=ref,event=tag
-            type=sha
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=latest   # toujours un tag latest
+            type=sha                # un tag unique par commit
+            type=ref,event=tag      # si tu crées une release (ex: v1.0.0)
+          labels: |
+            org.opencontainers.image.source=${{ github.repository }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3

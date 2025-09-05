@@ -1,0 +1,51 @@
+name: CI Frontend
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  frontend:
+    name: Frontend Tests (Angular)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: front
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Angular tests with coverage (headless)
+        env:
+          CHROME_BIN: ${{ env.CHROME_PATH }}
+        run: >
+          npm run test -- --watch=false --browsers=ChromeHeadless
+          --code-coverage --no-progress
+
+      - name: Upload Angular coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: angular-coverage
+          path: front/coverage/
+
+      - name: SonarCloud Scan (frontend)
+        uses: SonarSource/sonarqube-scan-action@v5
+        with:
+          args: >
+            -Dsonar.projectBaseDir=front
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
