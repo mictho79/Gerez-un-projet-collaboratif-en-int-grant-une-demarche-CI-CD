@@ -33,9 +33,9 @@ jobs:
         with:
           images: ${{ matrix.image }}
           tags: |
-            type=raw,value=latest   # toujours un tag latest
-            type=sha                # un tag unique par commit
-            type=ref,event=tag      # si tu crées une release (ex: v1.0.0)
+            type=raw,value=latest
+            type=sha
+            type=ref,event=tag
           labels: |
             org.opencontainers.image.source=${{ github.repository }}
 
@@ -60,5 +60,5 @@ jobs:
           platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=${{ matrix.image }}:buildcache
-          cache-to: type=registry,ref=${{ matrix.image }}:buildcache,mode=max
+          cache-from: type=registry,ref=mictho79/bobapp-buildcache
+          cache-to: type=registry,ref=mictho79/bobapp-buildcache,mode=max
